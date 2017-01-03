@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from pandas.compat import StringIO, string_types
 from ._utils import _init_session, _sanitize_dates
 
@@ -45,6 +46,9 @@ def get_oanda_currency_historical_rates(start, end, quote_currency="USD", base_c
     })
     df = df.set_index("Date")
     df = df[::-1]
+    for c in df.columns:
+        if df[c].dtype != np.float64:
+            df.loc[:, c] = pd.to_numeric(df[c].str.replace(',',''))
     if reversed:
         df.columns = pd.Index(df.columns.map(reverse_pair))
         df = 1 / df
